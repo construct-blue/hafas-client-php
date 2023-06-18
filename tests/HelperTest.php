@@ -1,4 +1,8 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
+namespace HafasClientTest;
 
 use PHPUnit\Framework\TestCase;
 use HafasClient\Helper\Time;
@@ -6,9 +10,11 @@ use HafasClient\Helper\ProductFilter;
 use HafasClient\Exception\ProductNotFoundException;
 use HafasClient\Exception\InvalidFilterException;
 
-final class HelperTest extends TestCase {
+final class HelperTest extends TestCase
+{
 
-    public function testTimestampParserWithoutOffset(): void {
+    public function testTimestampParserWithoutOffset(): void
+    {
         $timestamp = Time::parseDatetime('20210203', '123456');
         $this->assertEquals(2021, $timestamp->year);
         $this->assertEquals(2, $timestamp->month);
@@ -19,7 +25,8 @@ final class HelperTest extends TestCase {
         //$this->assertEquals(null, $timestamp->timezone); //TODO: support timezones
     }
 
-    public function testTimestampParserWithOffset(): void {
+    public function testTimestampParserWithOffset(): void
+    {
         $timestamp = Time::parseDatetime('20210203', '01020304');
         $this->assertEquals(2021, $timestamp->year);
         $this->assertEquals(2, $timestamp->month);
@@ -30,29 +37,34 @@ final class HelperTest extends TestCase {
         //$this->assertEquals(null, $timestamp->timezone); //TODO: support timezones
     }
 
-    public function testDateParsing(): void {
+    public function testDateParsing(): void
+    {
         $timestamp = Time::parseDate('20210203');
         $this->assertEquals(2021, $timestamp->year);
         $this->assertEquals(2, $timestamp->month);
         $this->assertEquals(3, $timestamp->day);
     }
 
-    public function testProductFilter1(): void {
+    public function testProductFilter1(): void
+    {
         $bitmask = ProductFilter::createBitmask(['nationalExpress']);
         $this->assertEquals(1, $bitmask);
     }
 
-    public function testProductFilter2(): void {
+    public function testProductFilter2(): void
+    {
         $bitmask = ProductFilter::createBitmask(['nationalExpress', 'tram', 'taxi']);
         $this->assertEquals(769, $bitmask);
     }
 
-    public function testProductFilter3(): void {
+    public function testProductFilter3(): void
+    {
         $this->expectException(ProductNotFoundException::class);
         ProductFilter::createBitmask(['somethingRandom']);
     }
 
-    public function testProductFilter4(): void {
+    public function testProductFilter4(): void
+    {
         $filter = new ProductFilter(
             nationalExpress: true,
             national: false,
@@ -66,13 +78,14 @@ final class HelperTest extends TestCase {
             taxi: true
         );
         $this->assertEquals([
-                                'type'  => 'PROD',
-                                'mode'  => 'INC',
-                                'value' => 769
-                            ], $filter->filter());
+            'type' => 'PROD',
+            'mode' => 'INC',
+            'value' => 769
+        ], $filter->filter());
     }
 
-    public function testProductFilter5(): void {
+    public function testProductFilter5(): void
+    {
         $this->expectException(InvalidFilterException::class);
         $filter = new ProductFilter(
             nationalExpress: false,

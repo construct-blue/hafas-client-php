@@ -1,6 +1,6 @@
 {
-  "name": "mrkriskrisu/hafas-client-php",
-  "description": "PHP library for HAFAS public transport APIs (currently only Deutsche Bahn).",
+  "name": "construct-blue/hafas-client-php",
+  "description": "PHP library for HAFAS public transport APIs (forked from mrkriskrisu/hafas-client-php).",
   "license": "MIT",
   "type": "library",
   "require": {
@@ -15,6 +15,11 @@
   "autoload": {
     "psr-4": {
       "HafasClient\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "HafasClientTest\\": "tests"
     }
   }
 }

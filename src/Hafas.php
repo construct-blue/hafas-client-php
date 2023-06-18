@@ -5,7 +5,9 @@ namespace HafasClient;
 use Carbon\Carbon;
 use DateTime;
 use GuzzleHttp\Exception\GuzzleException;
+use HafasClient\Helper\OperatorFilter;
 use HafasClient\Helper\Time;
+use HafasClient\Request\JourneyMatchRequest;
 use HafasClient\Response\JourneyMatchResponse;
 use HafasClient\Response\StationBoardResponse;
 use HafasClient\Response\LocMatchResponse;
@@ -193,9 +195,14 @@ abstract class Hafas
         return (new LocGeoPosResponse(Request::request($data)))->parse();
     }
 
-    public static function searchTrips(string $query, DateTime $fromWhen = null, DateTime $untilWhen = null, ProductFilter $filter = null): ?array
+    public static function tripsByName(JourneyMatchRequest $request): array
     {
-        $filter = $filter ?? new ProductFilter();
+        return (new JourneyMatchResponse(Request::request($request->jsonSerialize())))->parse();
+    }
+
+    public static function searchTrips(string $query, DateTime $fromWhen = null, DateTime $untilWhen = null, ProductFilter $productFilter = null, OperatorFilter $operatorFilter = null): ?array
+    {
+        $productFilter = $productFilter ?? new ProductFilter();
 
         $data = [
             'cfg' => [
@@ -206,9 +213,13 @@ abstract class Hafas
             'req' => [
                 'input' => $query,
                 'onlyCR' => false,
-                'jnyFltrL' => [$filter->filter()],
+                'jnyFltrL' => [$productFilter->filter()],
             ],
         ];
+
+        if ($operatorFilter) {
+            $data['req']['jnyFltrL'][] = $operatorFilter->filter();
+        }
 
         if ($fromWhen) {
             $data['req']['dateB'] = Time::formatDate($fromWhen);

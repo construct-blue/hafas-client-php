@@ -40,7 +40,7 @@ class StationBoardResponse {
             $this->rawStationBoard->svcResL[0]->res->jnyL[$journeyIndex]->prod->opr = $this->rawStationBoard->svcResL[0]->res->common->opL[$this->rawStationBoard->svcResL[0]->res->jnyL[$journeyIndex]->prod->oprX];
             unset($this->rawStationBoard->svcResL[0]->res->jnyL[$journeyIndex]->prod->oprX);
 
-            for($stopIndex = 0; $stopIndex < count($this->rawStationBoard->svcResL[0]->res->jnyL[$journeyIndex]->stopL); $stopIndex++) {
+            for($stopIndex = 0; $stopIndex < count($this->rawStationBoard->svcResL[0]->res->jnyL[$journeyIndex]->stopL ?? []); $stopIndex++) {
                 //map locX in stops
                 $this->rawStationBoard->svcResL[0]->res->jnyL[$journeyIndex]->stopL[$stopIndex]->loc = $this->rawStationBoard->svcResL[0]->res->common->locL[$this->rawStationBoard->svcResL[0]->res->jnyL[$journeyIndex]->stopL[$stopIndex]->locX];
                 unset($this->rawStationBoard->svcResL[0]->res->jnyL[$journeyIndex]->stopL[$stopIndex]->locX);
@@ -75,7 +75,7 @@ class StationBoardResponse {
                 'stopovers' => [],
             ];
 
-            foreach($rawJourney->stopL as $rawStop) {
+            foreach($rawJourney->stopL ?? [] as $rawStop) {
                 $journey['stopovers'][] = new Stopover(
                     stop:               new Stop(
                                             id:       $rawStop?->loc?->extId,
