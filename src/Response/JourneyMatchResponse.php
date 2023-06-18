@@ -37,8 +37,8 @@ class JourneyMatchResponse
             $journey = [
                 'type' => 'journey',
                 'id' => $rawJourney->jid,
-                'name' => $rawProd?->name,
-                'line' => $rawProd?->prodCtx?->line,
+                'name' => $rawProd?->name ?? null,
+                'line' => $rawProd?->prodCtx?->line ?? null,
                 'origin' => new Stop(
                     id: $rawOrigin?->extId,
                     name: $rawOrigin?->name,

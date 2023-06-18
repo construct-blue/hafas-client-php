@@ -181,7 +181,7 @@ class ProductFilter {
         return [
             'type'  => 'PROD',
             'mode'  => 'INC',
-            'value' => self::createBitmask($this->filter)
+            'value' => (string)self::createBitmask($this->filter)
         ];
     }
 

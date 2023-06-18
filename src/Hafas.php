@@ -3,6 +3,7 @@
 namespace HafasClient;
 
 use Carbon\Carbon;
+use DateTime;
 use GuzzleHttp\Exception\GuzzleException;
 use HafasClient\Response\JourneyMatchResponse;
 use HafasClient\Response\StationBoardResponse;
@@ -12,7 +13,8 @@ use HafasClient\Models\Journey;
 use HafasClient\Response\LocGeoPosResponse;
 use HafasClient\Helper\ProductFilter;
 
-abstract class Hafas {
+abstract class Hafas
+{
 
     /**
      * @throws GuzzleException|Exception\InvalidHafasResponse
@@ -28,26 +30,27 @@ abstract class Hafas {
         int           $maxJourneys = 5,
         int           $duration = -1,
         ProductFilter $filter = null,
-    ): ?array {
+    ): ?array
+    {
         if ($filter === null) {
             //true is default for all
             $filter = new ProductFilter();
         }
 
         $data = [
-            'req'  => [
-                'type'     => 'DEP',
-                'stbLoc'   => [
+            'req' => [
+                'type' => 'DEP',
+                'stbLoc' => [
                     'lid' => 'A=1@L=' . $lid . '@',
                 ],
-                'dirLoc'   => null,
+                'dirLoc' => null,
                 //[ //direction, not required
                 //                'lid' => '',
                 //],
-                'maxJny'   => $maxJourneys,
-                'date'     => $timestamp->format('Ymd'),
-                'time'     => $timestamp->format('His'),
-                'dur'      => $duration,
+                'maxJny' => $maxJourneys,
+                'date' => $timestamp->format('Ymd'),
+                'time' => $timestamp->format('His'),
+                'dur' => $duration,
                 'jnyFltrL' => [$filter->filter()]
             ],
             'meth' => 'StationBoard'
@@ -57,10 +60,10 @@ abstract class Hafas {
     }
 
     /**
-     * @param int                $lid
-     * @param Carbon             $timestamp
-     * @param int                $maxJourneys
-     * @param int                $duration
+     * @param int $lid
+     * @param Carbon $timestamp
+     * @param int $maxJourneys
+     * @param int $duration
      * @param ProductFilter|null $filter
      *
      * @return array|null
@@ -79,26 +82,27 @@ abstract class Hafas {
         int           $maxJourneys = 5,
         int           $duration = -1,
         ProductFilter $filter = null,
-    ): ?array {
+    ): ?array
+    {
         if ($filter === null) {
             //true is default for all
             $filter = new ProductFilter();
         }
 
         $data = [
-            'req'  => [
-                'type'     => 'ARR',
-                'stbLoc'   => [
+            'req' => [
+                'type' => 'ARR',
+                'stbLoc' => [
                     'lid' => 'A=1@L=' . $lid . '@',
                 ],
-                'dirLoc'   => null,
+                'dirLoc' => null,
                 //[ //direction, not required
                 //                'lid' => '',
                 //],
-                'maxJny'   => $maxJourneys,
-                'date'     => $timestamp->format('Ymd'),
-                'time'     => $timestamp->format('His'),
-                'dur'      => $duration,
+                'maxJny' => $maxJourneys,
+                'date' => $timestamp->format('Ymd'),
+                'time' => $timestamp->format('His'),
+                'dur' => $duration,
                 'jnyFltrL' => [$filter->filter()]
             ],
             'meth' => 'StationBoard'
@@ -118,12 +122,13 @@ abstract class Hafas {
     public static function getLocation(
         string $query,
         string $type = 'S'
-    ): ?array {
+    ): ?array
+    {
         $data = [
-            'req'  => [
+            'req' => [
                 'input' => [
                     'field' => 'S',
-                    'loc'   => [
+                    'loc' => [
                         'name' => $query,
                         'type' => $type
                     ]
@@ -139,9 +144,10 @@ abstract class Hafas {
      * @throws GuzzleException
      * @throws Exception\InvalidHafasResponse
      */
-    public static function getJourney(string $journeyId): ?Journey {
+    public static function getJourney(string $journeyId): ?Journey
+    {
         $data = [
-            'req'  => [
+            'req' => [
                 'jid' => $journeyId
             ],
             'meth' => 'JourneyDetails'
@@ -153,11 +159,12 @@ abstract class Hafas {
      * @throws GuzzleException
      * @throws Exception\InvalidHafasResponse
      */
-    public static function getNearby(float $latitude, float $longitude, $limit = 8): array {
+    public static function getNearby(float $latitude, float $longitude, $limit = 8): array
+    {
         $data = [
-            'req'  => [
-                "ring"     => [
-                    "cCrd"    => [
+            'req' => [
+                "ring" => [
+                    "cCrd" => [
                         "x" => $longitude * 1000000,
                         "y" => $latitude * 1000000
                     ],
@@ -166,18 +173,18 @@ abstract class Hafas {
                 ],
                 "locFltrL" => [
                     [
-                        "type"  => "PROD",
-                        "mode"  => "INC",
+                        "type" => "PROD",
+                        "mode" => "INC",
                         "value" => "1023"
                     ]
                 ],
-                "getPOIs"  => false,
+                "getPOIs" => false,
                 "getStops" => true,
-                "maxLoc"   => $limit
+                "maxLoc" => $limit
             ],
-            'cfg'  => [
+            'cfg' => [
                 'polyEnc' => 'GPA',
-                'rtMode'  => 'HYBRID',
+                'rtMode' => 'HYBRID',
             ],
             'meth' => 'LocGeoPos'
         ];
@@ -185,21 +192,31 @@ abstract class Hafas {
         return (new LocGeoPosResponse(Request::request($data)))->parse();
     }
 
-    public static function searchTrips(string $query): ?array {
+    public static function searchTrips(string $query, DateTime $fromWhen = null, DateTime $untilWhen = null, ProductFilter $filter = null): ?array
+    {
+        $filter = $filter ?? new ProductFilter();
+
         $data = [
-            'req'  => [
-                'input'    => $query,
-                'onlyCR'   => true,
-                'jnyFltrL' => [
-                    [
-                        'type'  => 'PROD',
-                        'mode'  => 'INC',
-                        'value' => '1023'
-                    ]
-                ]
+            'cfg' => [
+                'polyEnc' => 'GPA',
+                'rtMode' => 'REALTIME',
             ],
-            'meth' => 'JourneyMatch'
+            'meth' => 'JourneyMatch',
+            'req' => [
+                'input' => $query,
+                'onlyCR' => false,
+                'jnyFltrL' => [$filter->filter()],
+            ],
         ];
+
+        if ($fromWhen) {
+            $data['req']['dateB'] = $fromWhen->format('Ymd');
+            $data['req']['timeB'] = $fromWhen->format('His');
+        }
+        if ($untilWhen) {
+            $data['req']['dateE'] = $untilWhen->format('Ymd');
+            $data['req']['timeE'] = $untilWhen->format('His');
+        }
 
         return (new JourneyMatchResponse(Request::request($data)))->parse();
     }

@@ -7,29 +7,45 @@ use GuzzleHttp\Exception\GuzzleException;
 use stdClass;
 
 abstract class Request {
-
-    const SALT = 'bdI8UVj40K5fvxwf';
-
     /**
-     * @param array  $data
+     * @param array  $svcReqL
      * @param string $userAgent
      *
      * @return stdClass
      * @throws GuzzleException
      */
-    public static function request(array $data, string $userAgent = 'hafas-client-php'): stdClass {
+    public static function request(array $svcReqL, string $userAgent = 'hafas-client-php'): stdClass {
         $client = new Client();
 
-        $dummy              = self::getDummyRequestBody();
-        $dummy['svcReqL'][] = $data;
+        $request = json_decode(file_get_contents(__DIR__ . '/../profiles/db/request.json'), true);
+        $config = json_decode(file_get_contents(__DIR__ . '/../profiles/db/config.json'), true);
 
-        $requestBody = json_encode($dummy);
+        $requestBody = json_encode([
+            'lang' => $config['defaultLanguage'],
+            'svcReqL' => [$svcReqL],
+            'client' => $request['client'],
+            'ext' => $request['ext'],
+            'ver' => $request['ver'],
+            'auth' => $request['auth'],
+        ]);
 
-        $response = $client->post('https://reiseauskunft.bahn.de/bin/mgate.exe?checksum=' . self::getMac($requestBody), [
+        $query = [];
+        if ($config['addChecksum']) {
+            $query['checksum'] = self::getMac($requestBody, hex2bin($config['salt']));
+        }
+
+        if ($config['addMicMac']) {
+            $query['mic'] = self::getMic($requestBody);
+            $query['mac'] = self::getMac($requestBody, hex2bin($config['salt']));
+        }
+
+        $response = $client->post($config['endpoint'] . '?' . http_build_query($query), [
             'body'    => $requestBody,
             'headers' => [
                 'Content-Type' => 'application/json',
-                'User-Agent'   => $userAgent,
+                'Accept-Encoding' => 'gzip, br, deflate',
+                'User-Agent'   => $userAgent . uniqid(' '),
+                'connection'   => 'keep-alive',
             ]
 
         ]);
@@ -40,25 +56,7 @@ abstract class Request {
         return md5($requestBody);
     }
 
-    private static function getMac(string $requestBody): string {
-        return md5($requestBody . self::SALT);
-    }
-
-    private static function getDummyRequestBody(): array {
-        return [
-            'auth'    => [
-                'type' => 'AID',
-                'aid'  => 'n91dB8Z77MLdoR0K',
-            ],
-            'client'  => [
-                'id'   => 'DB',
-                'v'    => '16040000',
-                'type' => 'IPH',
-                'name' => 'DB Navigator'
-            ],
-            'ext'     => 'DB.R19.04.a',
-            'svcReqL' => null, //empty request
-            'ver'     => '1.16'
-        ];
+    private static function getMac(string $requestBody, string $salt): string {
+        return md5($requestBody . $salt);
     }
 }
