@@ -5,6 +5,7 @@ namespace HafasClient;
 use Carbon\Carbon;
 use DateTime;
 use GuzzleHttp\Exception\GuzzleException;
+use HafasClient\Helper\Time;
 use HafasClient\Response\JourneyMatchResponse;
 use HafasClient\Response\StationBoardResponse;
 use HafasClient\Response\LocMatchResponse;
@@ -210,12 +211,12 @@ abstract class Hafas
         ];
 
         if ($fromWhen) {
-            $data['req']['dateB'] = $fromWhen->format('Ymd');
-            $data['req']['timeB'] = $fromWhen->format('His');
+            $data['req']['dateB'] = Time::formatDate($fromWhen);
+            $data['req']['timeB'] = Time::formatTime($fromWhen);
         }
         if ($untilWhen) {
-            $data['req']['dateE'] = $untilWhen->format('Ymd');
-            $data['req']['timeE'] = $untilWhen->format('His');
+            $data['req']['dateE'] = Time::formatDate($untilWhen);
+            $data['req']['timeE'] = Time::formatTime($untilWhen);
         }
 
         return (new JourneyMatchResponse(Request::request($data)))->parse();

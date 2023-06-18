@@ -2,6 +2,7 @@
 
 namespace HafasClient\Response;
 
+use HafasClient\Exception\InvalidHafasResponse;
 use stdClass;
 use HafasClient\Helper\Time;
 use HafasClient\Models\Location;
@@ -13,8 +14,14 @@ class JourneyMatchResponse
 
     private stdClass $raw;
 
+    /**
+     * @throws InvalidHafasResponse
+     */
     public function __construct(stdClass $raw)
     {
+        if(!isset($raw->svcResL[0]->res->jnyL)) {
+            throw new InvalidHafasResponse();
+        }
         $this->raw = $raw;
     }
 

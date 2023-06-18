@@ -3,6 +3,7 @@
 namespace HafasClient\Helper;
 
 use Carbon\Carbon;
+use DateTime;
 
 abstract class Time {
 
@@ -34,4 +35,13 @@ abstract class Time {
         return Carbon::create($year, $month, $day);
     }
 
+    public static function formatDate(DateTime $dateTime): string
+    {
+        return $dateTime->format('Ymd');
+    }
+
+    public static function formatTime(DateTime $dateTime): string
+    {
+        return $dateTime->format('His');
+    }
 }
