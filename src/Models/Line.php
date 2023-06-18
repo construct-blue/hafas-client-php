@@ -16,6 +16,7 @@ class Line implements \JsonSerializable
     public ?string $mode;
     public ?string $product;
     public ?Operator $operator;
+    public ?string $admin;
 
     public function __construct(
         string $id,
@@ -25,6 +26,7 @@ class Line implements \JsonSerializable
         string $mode = null,
         string $product = null,
         Operator $operator = null,
+        string $admin = null
     ) {
         $this->id = $id;
         $this->name = $name;
@@ -33,6 +35,7 @@ class Line implements \JsonSerializable
         $this->mode = $mode;
         $this->product = $product;
         $this->operator = $operator;
+        $this->admin = $admin;
     }
 
     public function jsonSerialize(): mixed
@@ -45,7 +48,8 @@ class Line implements \JsonSerializable
             'number' => $this->number,
             'mode' => $this->mode,
             'product' => $this->product,
-            'operator' => $this->operator ?? null
+            'operator' => $this->operator ?? null,
+            'admin' => $this->admin ?? null,
         ];
     }
 

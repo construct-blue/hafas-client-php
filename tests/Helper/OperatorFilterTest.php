@@ -13,7 +13,7 @@ class OperatorFilterTest extends TestCase
     {
         $filter = new OperatorFilter('DB Fernverkehr AG', 'Österreichische Bundesbahnen');
         self::assertEquals([
-            'type' => 'PROD',
+            'type' => 'OP',
             'mode' => 'INC',
             'value'=> 'DB Fernverkehr AG,Österreichische Bundesbahnen'
         ], $filter->filter());

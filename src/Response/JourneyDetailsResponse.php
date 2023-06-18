@@ -106,16 +106,17 @@ class JourneyDetailsResponse
             direction: $rawJourney?->dirTxt ?? null,
             date: Time::parseDate($rawJourney->date),
             line: new Line(
-                id: '', //TODO
+                id: $rawLine?->prodCtx?->lineId ?? $rawLine?->prodCtx?->matchId ?? '', //TODO
                 name: $rawLine?->name ?? null,
                 category: $rawLine?->prodCtx?->catOut ?? null,
                 number: $rawLine?->number ?? null,
-                mode: '',   //TODO
+                mode: '',//TODO map to products $rawLine?->cls is bitmask of product
                 product: '',//TODO
                 operator: new Operator(
                     id: $rawLineOperator?->name ?? null, //TODO: where from?
                     name: $rawLineOperator?->name ?? null
-                )
+                ),
+                admin: $rawLine?->prodCtx?->admin ?? null,
             ),
             stopovers: $stopovers,
             remarks: $remarks,
