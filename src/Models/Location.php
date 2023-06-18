@@ -7,7 +7,7 @@ namespace HafasClient\Models;
  * @package HafasClient\Models
  * @todo    make readonly
  */
-class Location {
+class Location implements \JsonSerializable {
 
     public float  $latitude;
     public float  $longitude;
@@ -19,12 +19,17 @@ class Location {
         $this->altitude  = $altitude;
     }
 
+    public function jsonSerialize(): mixed
+    {
+        return [
+            'type'      => 'location',
+            'latitude'  => $this->latitude,
+            'longitude' => $this->longitude,
+            'altitude'  => $this->altitude,
+        ];
+    }
+
     public function __toString(): string {
-        return json_encode([
-                               'type'      => 'location',
-                               'latitude'  => $this->latitude,
-                               'longitude' => $this->longitude,
-                               'altitude'  => $this->altitude,
-                           ]);
+        return json_encode($this);
     }
 }

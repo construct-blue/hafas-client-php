@@ -39,6 +39,33 @@ class JourneyDetailsResponse
         $stopovers = [];
         foreach ($rawJourney->stopL as $rawStop) {
             $rawLoc = $rawCommon->locL[$rawStop->locX];
+            $plannedArrival = isset($rawStop->aTimeS) ? Time::parseDatetime($rawJourney->date, $rawStop->aTimeS) : null;
+            $arrival = isset($rawStop->aTimeR) ? Time::parseDatetime(
+                $rawJourney->date,
+                $rawStop->aTimeR
+            ) : $plannedArrival;
+            $plannedDeparture = isset($rawStop->dTimeS) ? Time::parseDatetime(
+                $rawJourney->date,
+                $rawStop->dTimeS
+            ) : null;
+            $departure = isset($rawStop->dTimeR) ? Time::parseDatetime(
+                $rawJourney->date,
+                $rawStop->dTimeR
+            ) : $plannedDeparture;
+
+            $departureDelay = null;
+            if ($plannedDeparture < $departure) {
+                $departureDelay = $departure->diffInMinutes($plannedDeparture);
+            }
+            $arrivalDelay = null;
+            if ($plannedArrival < $arrival) {
+                $arrivalDelay = $arrival->diffInMinutes($plannedArrival);
+            }
+
+            $arrivalPlatformPlanned = $rawStop?->aPlatfS ?? $rawStop?->aPltfS?->txt ?? null;
+            $arrivalPlatform = $rawStop?->aPlatfR ?? $rawStop?->aPltfR?->txt ?? $arrivalPlatformPlanned;
+            $departurePlatformPlanned = $rawStop?->dPlatfS ?? $rawStop?->dPltfS?->txt ?? null;
+            $departurePlatform = $rawStop?->dPlatfR ?? $rawStop?->dPltfR?->txt ?? $departurePlatformPlanned;
             $stopovers[] = new Stopover(
                 stop: new Stop(
                     id: $rawLoc?->extId,
@@ -50,13 +77,15 @@ class JourneyDetailsResponse
                     )
                 ),
                 index: $rawStop?->idx,
-                plannedArrival: isset($rawStop->aTimeS) ? Time::parseDatetime($rawJourney->date, $rawStop->aTimeS) : null,
-                predictedArrival: isset($rawStop->aTimeR) ? Time::parseDatetime($rawJourney->date, $rawStop->aTimeR) : null,
-                arrivalPlatform: $rawStop?->aPlatfS ?? null,
-                plannedDeparture: isset($rawStop->dTimeS) ? Time::parseDatetime($rawJourney->date, $rawStop->dTimeS) : null,
-                predictedDeparture: isset($rawStop->dTimeR) ? Time::parseDatetime($rawJourney->date, $rawStop->dTimeR) : null,
-                departurePlatform: $rawStop?->dPlatfS ?? null,
+                plannedArrival: $plannedArrival,
+                arrival: $arrival,
+                arrivalPlatform: $arrivalPlatform,
+                plannedDeparture: $plannedDeparture,
+                departure: $departure,
+                departurePlatform: $departurePlatform,
                 isCancelled: isset($rawStop?->aCncl) || isset($rawStop?->dCnl),
+                delay: $departureDelay ?? $arrivalDelay,
+                reported: ($rawStop?->dProgType ?? null) === 'REPORTED'
             );
         }
 
@@ -73,19 +102,19 @@ class JourneyDetailsResponse
         }
 
         return new Journey(
-            journeyId: $rawJourney?->jid,
-            direction: $rawJourney?->dirTxt,
+            journeyId: $rawJourney?->jid ?? null,
+            direction: $rawJourney?->dirTxt ?? null,
             date: Time::parseDate($rawJourney->date),
             line: new Line(
-                id: '???', //TODO
-                name: $rawLine?->name,
-                category: $rawLine?->prodCtx?->catOut,
-                number: $rawLine?->number,
-                mode: '???',   //TODO
-                product: '???',//TODO
+                id: '', //TODO
+                name: $rawLine?->name ?? null,
+                category: $rawLine?->prodCtx?->catOut ?? null,
+                number: $rawLine?->number ?? null,
+                mode: '',   //TODO
+                product: '',//TODO
                 operator: new Operator(
-                    id: $rawLineOperator?->name, //TODO: where from?
-                    name: $rawLineOperator?->name
+                    id: $rawLineOperator?->name ?? null, //TODO: where from?
+                    name: $rawLineOperator?->name ?? null
                 )
             ),
             stopovers: $stopovers,

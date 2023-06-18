@@ -200,6 +200,17 @@ abstract class Hafas
         return (new JourneyMatchResponse(Request::request($request->jsonSerialize())))->parse();
     }
 
+    public static function trip(string $id): Journey
+    {
+        $data = [
+            'req' => [
+                'jid' => $id
+            ],
+            'meth' => 'JourneyDetails'
+        ];
+        return (new JourneyDetailsResponse(Request::request($data)))->parse();
+    }
+
     public static function searchTrips(string $query, DateTime $fromWhen = null, DateTime $untilWhen = null, ProductFilter $productFilter = null, OperatorFilter $operatorFilter = null): ?array
     {
         $productFilter = $productFilter ?? new ProductFilter();
