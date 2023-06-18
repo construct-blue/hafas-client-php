@@ -18,6 +18,7 @@ use HafasClient\Helper\ProductFilter;
 
 abstract class Hafas
 {
+    public static string $profile = 'db';
 
     /**
      * @throws GuzzleException|Exception\InvalidHafasResponse

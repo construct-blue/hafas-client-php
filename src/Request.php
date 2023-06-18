@@ -15,19 +15,25 @@ abstract class Request {
      * @throws GuzzleException
      */
     public static function request(array $svcReqL, string $userAgent = 'hafas-client-php'): stdClass {
+        $profile = Hafas::$profile;
+
         $client = new Client();
+        $request = json_decode(file_get_contents(__DIR__ . "/../profiles/$profile/request.json"), true);
+        $config = json_decode(file_get_contents(__DIR__ . "/../profiles/$profile/config.json"), true);
 
-        $request = json_decode(file_get_contents(__DIR__ . '/../profiles/db/request.json'), true);
-        $config = json_decode(file_get_contents(__DIR__ . '/../profiles/db/config.json'), true);
-
-        $requestBody = json_encode([
+        $requestBody = [
             'lang' => $config['defaultLanguage'],
             'svcReqL' => [$svcReqL],
             'client' => $request['client'],
-            'ext' => $request['ext'],
             'ver' => $request['ver'],
             'auth' => $request['auth'],
-        ]);
+        ];
+
+        if (isset($request['ext'])) {
+            $requestBody['ext'] = $request['ext'];
+        }
+
+        $requestBody = json_encode($requestBody);
 
         $query = [];
         if ($config['addChecksum']) {
