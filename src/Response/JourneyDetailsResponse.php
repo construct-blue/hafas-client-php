@@ -24,6 +24,7 @@ class JourneyDetailsResponse
     public function __construct(stdClass $rawResponse)
     {
         $this->rawResponse = $rawResponse;
+        echo json_encode($rawResponse);
         if (!isset($rawResponse->svcResL[0]->res->journey)) {
             throw new InvalidHafasResponse();
         }

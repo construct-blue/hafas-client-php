@@ -49,11 +49,11 @@ class Stopover implements \JsonSerializable
         $this->reported = $reported;
     }
 
-    public function jsonSerialize(): mixed
+    public function jsonSerialize(): array
     {
         return [
             'type' => 'stopover',
-            'stop' => isset($this->stop) ? (string)$this->stop : null,
+            'stop' => $this->stop ?? null,
             'index' => $this->index,
             'plannedArrival' => $this->plannedArrival,
             'arrival' => $this->arrival,

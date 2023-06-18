@@ -26,7 +26,7 @@ class Stop implements \JsonSerializable
             'type' => 'stop',
             'id' => $this->id,
             'name' => $this->name,
-            'location' => isset($this->location) ? (string)$this->location : null
+            'location' => $this->location ?? null
         ];
     }
 

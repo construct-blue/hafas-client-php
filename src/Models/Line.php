@@ -45,7 +45,7 @@ class Line implements \JsonSerializable
             'number' => $this->number,
             'mode' => $this->mode,
             'product' => $this->product,
-            'operator' => isset($this->operator) ? (string)$this->operator : null
+            'operator' => $this->operator ?? null
         ];
     }
 

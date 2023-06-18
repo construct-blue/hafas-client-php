@@ -42,8 +42,8 @@ class Journey implements \JsonSerializable
             'type' => 'journey',
             'id' => $this->journeyId,
             'direction' => $this->direction,
-            'date' => $this->date?->format('Y-m-d'),
-            'line' => isset($this->line) ? (string)$this->line : null,
+            'date' => $this->date?->format('Y-m-d') ?? null,
+            'line' => $this->line ?? null,
             'stopovers' => $this->stopovers,
             'remarks' => $this->remarks,
         ];
