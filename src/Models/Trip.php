@@ -8,10 +8,10 @@ use Carbon\Carbon;
  * @package HafasClient\Models
  * @todo    make readonly
  */
-class Journey implements \JsonSerializable
+class Trip implements \JsonSerializable
 {
 
-    public string $journeyId;
+    public string $id;
     public ?string $direction;
     public ?Carbon $date;
     public ?Line $line;
@@ -21,14 +21,14 @@ class Journey implements \JsonSerializable
     public ?array $remarks;
 
     public function __construct(
-        string $journeyId,
+        string $id,
         string $direction = null,
         Carbon $date = null,
         Line $line = null,
         array $stopovers = null,
         array $remarks = null
     ) {
-        $this->journeyId = $journeyId;
+        $this->id = $id;
         $this->direction = $direction;
         $this->date = $date;
         $this->line = $line;
@@ -39,9 +39,8 @@ class Journey implements \JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            'type' => 'journey',
-            'id' => $this->journeyId,
-            'direction' => $this->direction,
+            'type' => 'trip',
+            'id' => $this->id,
             'date' => $this->date?->format('Y-m-d') ?? null,
             'line' => $this->line ?? null,
             'stopovers' => $this->stopovers,

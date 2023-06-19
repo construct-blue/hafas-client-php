@@ -6,13 +6,13 @@ use Carbon\Carbon;
 use DateTime;
 use GuzzleHttp\Exception\GuzzleException;
 use HafasClient\Helper\OperatorFilter;
-use HafasClient\Helper\Time;
+use HafasClient\Parser\TripParser;
 use HafasClient\Request\JourneyMatchRequest;
 use HafasClient\Response\JourneyMatchResponse;
 use HafasClient\Response\StationBoardResponse;
 use HafasClient\Response\LocMatchResponse;
 use HafasClient\Response\JourneyDetailsResponse;
-use HafasClient\Models\Journey;
+use HafasClient\Models\Trip;
 use HafasClient\Response\LocGeoPosResponse;
 use HafasClient\Helper\ProductFilter;
 
@@ -29,13 +29,12 @@ abstract class Hafas
      * @todo filter by direction
      */
     public static function getDepartures(
-        int           $lid,
-        Carbon        $timestamp,
-        int           $maxJourneys = 5,
-        int           $duration = -1,
+        int $lid,
+        Carbon $timestamp,
+        int $maxJourneys = 5,
+        int $duration = -1,
         ProductFilter $filter = null,
-    ): ?array
-    {
+    ): ?array {
         if ($filter === null) {
             //true is default for all
             $filter = new ProductFilter();
@@ -81,13 +80,12 @@ abstract class Hafas
      * @todo filter by direction
      */
     public static function getArrivals(
-        int           $lid,
-        Carbon        $timestamp,
-        int           $maxJourneys = 5,
-        int           $duration = -1,
+        int $lid,
+        Carbon $timestamp,
+        int $maxJourneys = 5,
+        int $duration = -1,
         ProductFilter $filter = null,
-    ): ?array
-    {
+    ): ?array {
         if ($filter === null) {
             //true is default for all
             $filter = new ProductFilter();
@@ -126,8 +124,7 @@ abstract class Hafas
     public static function getLocation(
         string $query,
         string $type = 'S'
-    ): ?array
-    {
+    ): ?array {
         $data = [
             'req' => [
                 'input' => [
@@ -148,7 +145,7 @@ abstract class Hafas
      * @throws GuzzleException
      * @throws Exception\InvalidHafasResponse
      */
-    public static function getJourney(string $journeyId): ?Journey
+    public static function getJourney(string $journeyId): ?Trip
     {
         $data = [
             'req' => [
@@ -156,7 +153,7 @@ abstract class Hafas
             ],
             'meth' => 'JourneyDetails'
         ];
-        return (new JourneyDetailsResponse(Request::request($data)))->parse();
+        return (new JourneyDetailsResponse(new TripParser()))->parse(Request::request($data));
     }
 
     /**
@@ -198,10 +195,10 @@ abstract class Hafas
 
     public static function tripsByName(JourneyMatchRequest $request): array
     {
-        return (new JourneyMatchResponse(Request::request($request->jsonSerialize())))->parse();
+        return (new JourneyMatchResponse(new TripParser()))->parse(Request::request($request->jsonSerialize()));
     }
 
-    public static function trip(string $id): Journey
+    public static function trip(string $id): Trip
     {
         $data = [
             'req' => [
@@ -209,39 +206,33 @@ abstract class Hafas
             ],
             'meth' => 'JourneyDetails'
         ];
-        return (new JourneyDetailsResponse(Request::request($data)))->parse();
+        return (new JourneyDetailsResponse(new TripParser()))->parse(Request::request($data));
     }
 
-    public static function searchTrips(string $query, DateTime $fromWhen = null, DateTime $untilWhen = null, ProductFilter $productFilter = null, OperatorFilter $operatorFilter = null): ?array
-    {
-        $productFilter = $productFilter ?? new ProductFilter();
+    public static function searchTrips(
+        string $query,
+        DateTime $fromWhen = null,
+        DateTime $untilWhen = null,
+        ProductFilter $productFilter = null,
+        OperatorFilter $operatorFilter = null
+    ): ?array {
+        $journeyMatchRequest = new JourneyMatchRequest($query, false);
 
-        $data = [
-            'cfg' => [
-                'polyEnc' => 'GPA',
-                'rtMode' => 'REALTIME',
-            ],
-            'meth' => 'JourneyMatch',
-            'req' => [
-                'input' => $query,
-                'onlyCR' => false,
-                'jnyFltrL' => [$productFilter->filter()],
-            ],
-        ];
+        if ($productFilter) {
+            $journeyMatchRequest->setProductFilter($productFilter);
+        }
 
         if ($operatorFilter) {
-            $data['req']['jnyFltrL'][] = $operatorFilter->filter();
+            $journeyMatchRequest->setOperatorFilter($operatorFilter);
         }
 
         if ($fromWhen) {
-            $data['req']['dateB'] = Time::formatDate($fromWhen);
-            $data['req']['timeB'] = Time::formatTime($fromWhen);
+            $journeyMatchRequest->setFromWhen($fromWhen);
         }
         if ($untilWhen) {
-            $data['req']['dateE'] = Time::formatDate($untilWhen);
-            $data['req']['timeE'] = Time::formatTime($untilWhen);
+            $journeyMatchRequest->setUntilWhen($untilWhen);
         }
 
-        return (new JourneyMatchResponse(Request::request($data)))->parse();
+        return self::tripsByName($journeyMatchRequest);
     }
 }

@@ -2,18 +2,21 @@
 
 declare(strict_types=1);
 
-namespace HafasClient\Response;
+namespace HafasClientTest\Response;
 
+use HafasClient\Parser\TripParser;
+use HafasClient\Response\JourneyDetailsResponse;
 use PHPUnit\Framework\TestCase;
 
 class JourneyDetailsResponseTest extends TestCase
 {
     public function testParse()
     {
-        $response = new JourneyDetailsResponse(json_decode(file_get_contents(
-            __DIR__ . '/../raw-responses/JouneyDetails-ICE28-running-with-delay.json'
-        )));
-        $journey = $response->parse();
+        $rawResponse = json_decode(file_get_contents(
+            __DIR__ . '/../raw-responses/JourneyDetails-ICE28-running-with-delay.json'
+        ));
+        $response = new JourneyDetailsResponse(new TripParser());
+        $journey = $response->parse($rawResponse);
         self::assertEquals('ICE 28', $journey->line->name);
         self::assertEquals('28', $journey->line->number);
         self::assertEquals('2023-06-18', $journey->date->format('Y-m-d'));
