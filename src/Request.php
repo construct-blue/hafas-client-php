@@ -4,65 +4,83 @@ namespace HafasClient;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use HafasClient\Profile\Config;
 use stdClass;
 
-abstract class Request {
+class Request
+{
+
+    private array $request;
+
     /**
-     * @param array  $svcReqL
-     * @param string $userAgent
+     * @param array $request
+     */
+    public function __construct(array $request)
+    {
+        $this->request = $request;
+    }
+
+    public static function fromFile(string $file): Request
+    {
+        return new Request(json_decode(file_get_contents($file), true));
+    }
+
+
+    /**
+     * @param Config $config
+     * @param array $svcReqL
      *
      * @return stdClass
      * @throws GuzzleException
      */
-    public static function request(array $svcReqL, string $userAgent = 'hafas-client-php'): stdClass {
-        $profile = Hafas::$profile;
-
+    public function request(Config $config, array $svcReqL): stdClass
+    {
         $client = new Client();
-        $request = json_decode(file_get_contents(__DIR__ . "/../profiles/$profile/request.json"), true);
-        $config = json_decode(file_get_contents(__DIR__ . "/../profiles/$profile/config.json"), true);
 
         $requestBody = [
-            'lang' => $config['defaultLanguage'],
+            'lang' => $config->getDefaultLanguage(),
             'svcReqL' => [$svcReqL],
-            'client' => $request['client'],
-            'ver' => $request['ver'],
-            'auth' => $request['auth'],
+            'client' => $this->request['client'],
+            'ver' => $this->request['ver'],
+            'auth' => $this->request['auth'],
         ];
 
-        if (isset($request['ext'])) {
-            $requestBody['ext'] = $request['ext'];
+        if (isset($this->request['ext'])) {
+            $requestBody['ext'] = $this->request['ext'];
         }
 
         $requestBody = json_encode($requestBody);
 
         $query = [];
-        if ($config['addChecksum']) {
-            $query['checksum'] = self::getMac($requestBody, hex2bin($config['salt']));
+        if ($config->isAddChecksum()) {
+            $query['checksum'] = $this->getMac($requestBody, hex2bin($config->getSalt()));
         }
 
-        if ($config['addMicMac']) {
-            $query['mic'] = self::getMic($requestBody);
-            $query['mac'] = self::getMac($requestBody, hex2bin($config['salt']));
+        if ($config->isAddMicMac()) {
+            $query['mic'] = $this->getMic($requestBody);
+            $query['mac'] = $this->getMac($requestBody, hex2bin($config->getSalt()));
         }
 
-        $response = $client->post($config['endpoint'] . '?' . http_build_query($query), [
-            'body'    => $requestBody,
+        $response = $client->post($config->getEndpoint() . '?' . http_build_query($query), [
+            'body' => $requestBody,
             'headers' => [
                 'Content-Type' => 'application/json',
                 'Accept-Encoding' => 'gzip, br, deflate',
-                'User-Agent'   => $userAgent . uniqid(' '),
-                'connection'   => 'keep-alive',
+                'User-Agent' => $config->getUserAgent() . uniqid(' '),
+                'connection' => 'keep-alive',
             ]
 
         ]);
         return json_decode($response->getBody()->getContents());
     }
 
-    private static function getMic(string $requestBody): string {
+    private function getMic(string $requestBody): string
+    {
         return md5($requestBody);
     }
 
-    private static function getMac(string $requestBody, string $salt): string {
+    private function getMac(string $requestBody, string $salt): string
+    {
         return md5($requestBody . $salt);
     }
 }

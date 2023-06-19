@@ -12,33 +12,39 @@ use HafasClient\Models\Operator;
 use HafasClient\Models\Remark;
 use HafasClient\Models\Stop;
 use HafasClient\Models\Stopover;
+use HafasClient\Profile\Config;
 use stdClass;
 
 class TripParser
 {
+    public function __construct(private Config $config)
+    {
+    }
+
     public function parse(stdClass $rawCommon, stdClass $rawJourney): Trip
     {
+        $defaultTZOffset = $this->config->getDefaultTZOffset();
         $rawLine = $rawCommon->prodL[$rawJourney->prodX];
         $rawLineOperator = $rawCommon->opL[$rawLine->oprX];
 
         $stopovers = [];
         foreach ($rawJourney->stopL as $index => $rawStop) {
             $rawLoc = $rawCommon->locL[$rawStop->locX];
-            $plannedArrival = isset($rawStop->aTimeS) ? Time::parseDatetime($rawJourney->date, $rawStop->aTimeS, (float)($rawStop->aTZOffset ?? 0)) : null;
+            $plannedArrival = isset($rawStop->aTimeS) ? Time::parseDatetime($rawJourney->date, $rawStop->aTimeS, (float)($rawStop->aTZOffset ?? $defaultTZOffset)) : null;
             $arrival = isset($rawStop->aTimeR) ? Time::parseDatetime(
                 $rawJourney->date,
                 $rawStop->aTimeR,
-                (float)($rawStop->aTZOffset ?? 0)
+                (float)($rawStop->aTZOffset ?? $defaultTZOffset)
             ) : $plannedArrival;
             $plannedDeparture = isset($rawStop->dTimeS) ? Time::parseDatetime(
                 $rawJourney->date,
                 $rawStop->dTimeS,
-                (float)($rawStop->dTZOffset ?? 0)
+                (float)($rawStop->dTZOffset ?? $defaultTZOffset)
             ) : null;
             $departure = isset($rawStop->dTimeR) ? Time::parseDatetime(
                 $rawJourney->date,
                 $rawStop->dTimeR,
-                (float)($rawStop->dTZOffset ?? 0)
+                (float)($rawStop->dTZOffset ?? $defaultTZOffset)
             ) : $plannedDeparture;
 
             $departureDelay = null;

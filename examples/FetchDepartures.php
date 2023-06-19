@@ -4,7 +4,7 @@ use HafasClient\Helper\ProductFilter;
 
 require_once '../vendor/autoload.php';
 
-$data = \HafasClient\Hafas::getDepartures(
+$data = \HafasClient\Hafas::createDB()->getDepartures(
     lid: 8000152,
     timestamp: \Carbon\Carbon::now(),
     maxJourneys: 2,

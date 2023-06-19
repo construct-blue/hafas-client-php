@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace HafasClientTest\Response;
 
 use HafasClient\Parser\TripParser;
+use HafasClient\Profile\Config;
 use HafasClient\Response\JourneyDetailsResponse;
 use PHPUnit\Framework\TestCase;
 
@@ -15,7 +16,7 @@ class JourneyDetailsResponseTest extends TestCase
         $rawResponse = json_decode(file_get_contents(
             __DIR__ . '/../raw-responses/JourneyDetails-ICE28-running-with-delay.json'
         ));
-        $response = new JourneyDetailsResponse(new TripParser());
+        $response = new JourneyDetailsResponse(new TripParser(Config::fromFile(__DIR__ . '/../config/config.json')));
         $journey = $response->parse($rawResponse);
         self::assertEquals('ICE 28', $journey->line->name);
         self::assertEquals('28', $journey->line->number);

@@ -7,6 +7,7 @@ use DateTime;
 use GuzzleHttp\Exception\GuzzleException;
 use HafasClient\Helper\OperatorFilter;
 use HafasClient\Parser\TripParser;
+use HafasClient\Profile\Config;
 use HafasClient\Request\JourneyMatchRequest;
 use HafasClient\Response\JourneyMatchResponse;
 use HafasClient\Response\StationBoardResponse;
@@ -16,9 +17,35 @@ use HafasClient\Models\Trip;
 use HafasClient\Response\LocGeoPosResponse;
 use HafasClient\Helper\ProductFilter;
 
-abstract class Hafas
+class Hafas
 {
-    public static string $profile = 'db';
+    private Request $request;
+    private Config $config;
+
+    /**
+     * @param Config $config
+     * @param Request $request
+     */
+    public function __construct(Config $config, Request $request)
+    {
+        $this->config = $config;
+        $this->request = $request;
+    }
+
+    public static function createDB(): Hafas
+    {
+        $config = Config::fromFile(__DIR__ . "/../profiles/db/config.json");
+        $request = Request::fromFile(__DIR__ . "/../profiles/db/request.json");
+        return new Hafas($config, $request);
+    }
+
+    public static function createOeBB(): Hafas
+    {
+        $config = Config::fromFile(__DIR__ . "/../profiles/oebb/config.json");
+        $request = Request::fromFile(__DIR__ . "/../profiles/oebb/request.json");
+        return new Hafas($config, $request);
+    }
+
 
     /**
      * @throws GuzzleException|Exception\InvalidHafasResponse
@@ -28,7 +55,7 @@ abstract class Hafas
      * @todo support remarks, hints, warnings
      * @todo filter by direction
      */
-    public static function getDepartures(
+    public function getDepartures(
         int $lid,
         Carbon $timestamp,
         int $maxJourneys = 5,
@@ -59,7 +86,7 @@ abstract class Hafas
             'meth' => 'StationBoard'
         ];
 
-        return (new StationBoardResponse(Request::request($data)))->parse();
+        return (new StationBoardResponse($this->request->request($this->config, $data)))->parse();
     }
 
     /**
@@ -79,7 +106,7 @@ abstract class Hafas
      * @todo support remarks, hints, warnings
      * @todo filter by direction
      */
-    public static function getArrivals(
+    public function getArrivals(
         int $lid,
         Carbon $timestamp,
         int $maxJourneys = 5,
@@ -110,7 +137,7 @@ abstract class Hafas
             'meth' => 'StationBoard'
         ];
 
-        return (new StationBoardResponse(Request::request($data)))->parse();
+        return (new StationBoardResponse($this->request->request($this->config, $data)))->parse();
     }
 
     /**
@@ -121,7 +148,7 @@ abstract class Hafas
      * @throws Exception\InvalidHafasResponse
      * @throws GuzzleException
      */
-    public static function getLocation(
+    public function getLocation(
         string $query,
         string $type = 'S'
     ): ?array {
@@ -138,14 +165,14 @@ abstract class Hafas
             'meth' => 'LocMatch'
         ];
 
-        return (new LocMatchResponse(Request::request($data)))->parse();
+        return (new LocMatchResponse($this->request->request($this->config, $data)))->parse();
     }
 
     /**
      * @throws GuzzleException
      * @throws Exception\InvalidHafasResponse
      */
-    public static function getJourney(string $journeyId): ?Trip
+    public function getJourney(string $journeyId): ?Trip
     {
         $data = [
             'req' => [
@@ -153,14 +180,16 @@ abstract class Hafas
             ],
             'meth' => 'JourneyDetails'
         ];
-        return (new JourneyDetailsResponse(new TripParser()))->parse(Request::request($data));
+        return (new JourneyDetailsResponse(new TripParser($this->config)))->parse(
+            $this->request->request($this->config, $data)
+        );
     }
 
     /**
      * @throws GuzzleException
      * @throws Exception\InvalidHafasResponse
      */
-    public static function getNearby(float $latitude, float $longitude, $limit = 8): array
+    public function getNearby(float $latitude, float $longitude, $limit = 8): array
     {
         $data = [
             'req' => [
@@ -190,7 +219,7 @@ abstract class Hafas
             'meth' => 'LocGeoPos'
         ];
 
-        return (new LocGeoPosResponse(Request::request($data)))->parse();
+        return (new LocGeoPosResponse($this->request->request($this->config, $data)))->parse();
     }
 
     /**
@@ -199,12 +228,14 @@ abstract class Hafas
      * @throws Exception\InvalidHafasResponse
      * @throws GuzzleException
      */
-    public static function tripsByName(JourneyMatchRequest $request): array
+    public function tripsByName(JourneyMatchRequest $request): array
     {
-        return (new JourneyMatchResponse(new TripParser()))->parse(Request::request($request->jsonSerialize()));
+        return (new JourneyMatchResponse(new TripParser($this->config)))->parse(
+            $this->request->request($this->config, $request->jsonSerialize())
+        );
     }
 
-    public static function trip(string $id): Trip
+    public function trip(string $id): Trip
     {
         $data = [
             'req' => [
@@ -212,7 +243,9 @@ abstract class Hafas
             ],
             'meth' => 'JourneyDetails'
         ];
-        return (new JourneyDetailsResponse(new TripParser()))->parse(Request::request($data));
+        return (new JourneyDetailsResponse(new TripParser($this->config)))->parse(
+            $this->request->request($this->config, $data)
+        );
     }
 
     /**
@@ -225,7 +258,7 @@ abstract class Hafas
      * @throws Exception\InvalidHafasResponse
      * @throws GuzzleException
      */
-    public static function searchTrips(
+    public function searchTrips(
         string $query,
         DateTime $fromWhen = null,
         DateTime $untilWhen = null,
@@ -249,6 +282,6 @@ abstract class Hafas
             $journeyMatchRequest->setUntilWhen($untilWhen);
         }
 
-        return self::tripsByName($journeyMatchRequest);
+        return $this->tripsByName($journeyMatchRequest);
     }
 }

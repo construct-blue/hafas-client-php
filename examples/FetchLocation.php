@@ -3,7 +3,7 @@
 require_once '../vendor/autoload.php';
 
 $query = "Hannover Hbf";
-$data  = \HafasClient\Hafas::getLocation($query);
+$data  = \HafasClient\Hafas::createDB()->getLocation($query);
 
 echo '** You\'ve searched for "' . $query . '" **' . PHP_EOL . PHP_EOL;
 
