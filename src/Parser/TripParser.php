@@ -87,6 +87,9 @@ class TripParser
 
         $remarks = [];
         foreach ($rawJourney->msgL ?? [] as $message) {
+            if (!isset($message->remX)) {
+                continue;
+            }
             $rawMessage = $rawCommon->remL[$message->remX];
 
             $remarks[] = new Remark(
