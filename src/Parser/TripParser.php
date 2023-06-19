@@ -25,7 +25,7 @@ class TripParser
     {
         $defaultTZOffset = $this->config->getDefaultTZOffset();
         $rawLine = $rawCommon->prodL[$rawJourney->prodX];
-        $rawLineOperator = $rawCommon->opL[$rawLine->oprX];
+        $rawLineOperator = $rawCommon->opL[$rawLine->oprX ?? 0] ?? null;
 
         $stopovers = [];
         foreach ($rawJourney->stopL as $index => $rawStop) {
