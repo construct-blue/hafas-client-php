@@ -100,6 +100,11 @@ class TripParser
             );
         }
 
+        $admin = null;
+        if (isset($rawLine?->prodCtx?->admin) && $rawLine?->prodCtx?->admin) {
+            $admin = trim((string)$rawLine?->prodCtx?->admin, '_');
+        }
+
         return new Trip(
             id: $rawJourney?->jid ?? '',
             direction: $rawJourney?->dirTxt ?? null,
@@ -115,7 +120,7 @@ class TripParser
                     id: $rawLineOperator?->name ?? null, //TODO: where from?
                     name: $rawLineOperator?->name ?? null
                 ),
-                admin: $rawLine?->prodCtx?->admin ?? null,
+                admin: $admin,
             ),
             stopovers: $stopovers,
             remarks: $remarks,
