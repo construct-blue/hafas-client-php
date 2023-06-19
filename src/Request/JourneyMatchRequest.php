@@ -19,6 +19,8 @@ class JourneyMatchRequest implements JsonSerializable
     private ProductFilter $productFilter;
     private OperatorFilter $operatorFilter;
 
+    private ?string $admin;
+
     /**
      * @param string $query
      * @param bool $onlyCurrentlyRunning
@@ -88,6 +90,24 @@ class JourneyMatchRequest implements JsonSerializable
     public function setOperatorFilter(OperatorFilter $operatorFilter): JourneyMatchRequest
     {
         $this->operatorFilter = $operatorFilter;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getAdmin(): ?string
+    {
+        return $this->admin;
+    }
+
+    /**
+     * @param string|null $admin
+     * @return JourneyMatchRequest
+     */
+    public function setAdmin(?string $admin): JourneyMatchRequest
+    {
+        $this->admin = $admin;
         return $this;
     }
 
