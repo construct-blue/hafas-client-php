@@ -19,7 +19,7 @@ class JourneyMatchRequest implements JsonSerializable
     private ProductFilter $productFilter;
     private OperatorFilter $operatorFilter;
 
-    private ?string $admin;
+    private ?string $admin = null;
 
     /**
      * @param string $query
