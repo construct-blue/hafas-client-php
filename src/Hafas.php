@@ -193,6 +193,12 @@ abstract class Hafas
         return (new LocGeoPosResponse(Request::request($data)))->parse();
     }
 
+    /**
+     * @param JourneyMatchRequest $request
+     * @return Trip[]
+     * @throws Exception\InvalidHafasResponse
+     * @throws GuzzleException
+     */
     public static function tripsByName(JourneyMatchRequest $request): array
     {
         return (new JourneyMatchResponse(new TripParser()))->parse(Request::request($request->jsonSerialize()));
@@ -209,13 +215,23 @@ abstract class Hafas
         return (new JourneyDetailsResponse(new TripParser()))->parse(Request::request($data));
     }
 
+    /**
+     * @param string $query
+     * @param DateTime|null $fromWhen
+     * @param DateTime|null $untilWhen
+     * @param ProductFilter|null $productFilter
+     * @param OperatorFilter|null $operatorFilter
+     * @return Trip[]
+     * @throws Exception\InvalidHafasResponse
+     * @throws GuzzleException
+     */
     public static function searchTrips(
         string $query,
         DateTime $fromWhen = null,
         DateTime $untilWhen = null,
         ProductFilter $productFilter = null,
         OperatorFilter $operatorFilter = null
-    ): ?array {
+    ): array {
         $journeyMatchRequest = new JourneyMatchRequest($query, false);
 
         if ($productFilter) {

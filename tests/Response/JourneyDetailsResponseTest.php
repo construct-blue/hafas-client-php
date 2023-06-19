@@ -35,8 +35,8 @@ class JourneyDetailsResponseTest extends TestCase
         self::assertEquals('18:48:00', $journey->stopovers[16]->plannedDeparture->format('H:i:s'));
 
 
-        self::assertEquals(22, $journey->stopovers[17]->delay);
-        self::assertEquals(22, $journey->stopovers[18]->delay);
+        self::assertEquals(1320, $journey->stopovers[17]->delay);
+        self::assertEquals(1320, $journey->stopovers[18]->delay);
         self::assertEquals('19:30:00', $journey->stopovers[18]->arrival->format('H:i:s'));
         self::assertEquals('19:09:00', $journey->stopovers[18]->plannedArrival->format('H:i:s'));
         self::assertEquals('19:32:00', $journey->stopovers[18]->departure->format('H:i:s'));

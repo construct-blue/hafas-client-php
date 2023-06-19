@@ -87,11 +87,11 @@ class StationBoardResponse {
                                                       )
                                         ),
                     index:              $rawStop?->idx,
-                    plannedArrival:     isset($rawStop->aTimeS) ? Time::parseDatetime($rawJourney->date, $rawStop->aTimeS) : null,
-                    arrival:   isset($rawStop->aTimeR) ? Time::parseDatetime($rawJourney->date, $rawStop->aTimeR) : null,
+                    plannedArrival:     isset($rawStop->aTimeS) ? Time::parseDatetime($rawJourney->date, $rawStop->aTimeS, (float)$rawStop->aTZOffset) : null,
+                    arrival:   isset($rawStop->aTimeR) ? Time::parseDatetime($rawJourney->date, $rawStop->aTimeR, (float)$rawStop->aTZOffset) : null,
                     arrivalPlatform:    $rawStop?->aPlatfS ?? null,
-                    plannedDeparture:   isset($rawStop->dTimeS) ? Time::parseDatetime($rawJourney->date, $rawStop->dTimeS) : null,
-                    departure: isset($rawStop->dTimeR) ? Time::parseDatetime($rawJourney->date, $rawStop->dTimeR) : null,
+                    plannedDeparture:   isset($rawStop->dTimeS) ? Time::parseDatetime($rawJourney->date, $rawStop->dTimeS, (float)$rawStop->dTZOffset) : null,
+                    departure: isset($rawStop->dTimeR) ? Time::parseDatetime($rawJourney->date, $rawStop->dTimeR, (float)$rawStop->dTZOffset) : null,
                     departurePlatform:  $rawStop?->dPlatfS ?? null,
                     isCancelled:        isset($rawStop?->aCncl) || isset($rawStop?->dCnl),
                 );

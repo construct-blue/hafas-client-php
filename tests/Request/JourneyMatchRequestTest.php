@@ -7,6 +7,7 @@ namespace HafasClientTest\Request;
 use DateTime;
 use HafasClient\Helper\OperatorFilter;
 use HafasClient\Helper\ProductFilter;
+use HafasClient\Helper\Time;
 use HafasClient\Request\JourneyMatchRequest;
 use PHPUnit\Framework\TestCase;
 
@@ -34,6 +35,8 @@ class JourneyMatchRequestTest extends TestCase
     public function testSearchWithTimeRange()
     {
         $request = new JourneyMatchRequest('ICE 70', false);
+        $fromWhen = new DateTime('today 00:00');
+        $untilWhen = new DateTime('today 23:59');
         $request->setFromWhen(new DateTime('today 00:00'));
         $request->setUntilWhen(new DateTime('today 23:59'));
         self::assertEquals([
@@ -48,9 +51,9 @@ class JourneyMatchRequestTest extends TestCase
                 'jnyFltrL' => [
                     (new ProductFilter())->filter()
                 ],
-                'dateB' => '20230618',
+                'dateB' => Time::formatDate($fromWhen),
                 'timeB' => '000000',
-                'dateE' => '20230618',
+                'dateE' => Time::formatDate($untilWhen),
                 'timeE' => '235900',
             ],
         ], $request->jsonSerialize());

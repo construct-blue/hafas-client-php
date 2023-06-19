@@ -24,18 +24,21 @@ class TripParser
         $stopovers = [];
         foreach ($rawJourney->stopL as $index => $rawStop) {
             $rawLoc = $rawCommon->locL[$rawStop->locX];
-            $plannedArrival = isset($rawStop->aTimeS) ? Time::parseDatetime($rawJourney->date, $rawStop->aTimeS) : null;
+            $plannedArrival = isset($rawStop->aTimeS) ? Time::parseDatetime($rawJourney->date, $rawStop->aTimeS, (float)$rawStop->aTZOffset) : null;
             $arrival = isset($rawStop->aTimeR) ? Time::parseDatetime(
                 $rawJourney->date,
-                $rawStop->aTimeR
+                $rawStop->aTimeR,
+                (float)$rawStop->aTZOffset
             ) : $plannedArrival;
             $plannedDeparture = isset($rawStop->dTimeS) ? Time::parseDatetime(
                 $rawJourney->date,
-                $rawStop->dTimeS
+                $rawStop->dTimeS,
+                (float)$rawStop->dTZOffset
             ) : null;
             $departure = isset($rawStop->dTimeR) ? Time::parseDatetime(
                 $rawJourney->date,
-                $rawStop->dTimeR
+                $rawStop->dTimeR,
+                (float)$rawStop->dTZOffset
             ) : $plannedDeparture;
 
             $departureDelay = null;
