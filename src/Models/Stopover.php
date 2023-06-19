@@ -21,6 +21,8 @@ class Stopover implements \JsonSerializable
     public ?string $departurePlatform;
     public ?bool $isCancelled;
     public ?int $delay;
+    private ?int $arrivalDelay;
+    private ?int $departureDelay;
     public ?bool $reported;
 
     public function __construct(
@@ -34,6 +36,8 @@ class Stopover implements \JsonSerializable
         string $departurePlatform = null,
         bool $isCancelled = null,
         int $delay = null,
+        int $arrivalDelay = null,
+        int $departureDelay = null,
         bool $reported = null
     ) {
         $this->stop = $stop;
@@ -46,6 +50,8 @@ class Stopover implements \JsonSerializable
         $this->departurePlatform = $departurePlatform;
         $this->isCancelled = $isCancelled;
         $this->delay = $delay;
+        $this->arrivalDelay = $arrivalDelay;
+        $this->departureDelay = $departureDelay;
         $this->reported = $reported;
     }
 
@@ -63,6 +69,8 @@ class Stopover implements \JsonSerializable
             'departurePlatform' => $this->departurePlatform,
             'isCancelled' => $this->isCancelled,
             'delay' => $this->delay,
+            'arrivalDelay' => $this->arrivalDelay,
+            'departureDelay' => $this->departureDelay,
             'reported' => $this->reported
         ];
     }

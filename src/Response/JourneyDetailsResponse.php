@@ -85,6 +85,8 @@ class JourneyDetailsResponse
                 departurePlatform: $departurePlatform,
                 isCancelled: isset($rawStop?->aCncl) || isset($rawStop?->dCnl),
                 delay: $departureDelay ?? $arrivalDelay,
+                arrivalDelay: $arrivalDelay,
+                departureDelay: $departureDelay,
                 reported: ($rawStop?->dProgType ?? null) === 'REPORTED'
             );
         }
