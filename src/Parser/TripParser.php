@@ -30,7 +30,11 @@ class TripParser
         $stopovers = [];
         foreach ($rawJourney->stopL as $index => $rawStop) {
             $rawLoc = $rawCommon->locL[$rawStop->locX];
-            $plannedArrival = isset($rawStop->aTimeS) ? Time::parseDatetime($rawJourney->date, $rawStop->aTimeS, (float)($rawStop->aTZOffset ?? $defaultTZOffset)) : null;
+            $plannedArrival = isset($rawStop->aTimeS) ? Time::parseDatetime(
+                $rawJourney->date,
+                $rawStop->aTimeS,
+                (float)($rawStop->aTZOffset ?? $defaultTZOffset)
+            ) : null;
             $arrival = isset($rawStop->aTimeR) ? Time::parseDatetime(
                 $rawJourney->date,
                 $rawStop->aTimeR,
@@ -60,6 +64,8 @@ class TripParser
             $arrivalPlatform = $rawStop?->aPlatfR ?? $rawStop?->aPltfR?->txt ?? $arrivalPlatformPlanned;
             $departurePlatformPlanned = $rawStop?->dPlatfS ?? $rawStop?->dPltfS?->txt ?? null;
             $departurePlatform = $rawStop?->dPlatfR ?? $rawStop?->dPltfR?->txt ?? $departurePlatformPlanned;
+            $remarks = $this->parseRemarks($rawStop->msgL ?? [], $rawCommon->remL ?? []);
+
             $stopovers[] = new Stopover(
                 stop: new Stop(
                     id: $rawLoc?->extId ?? '',
@@ -81,24 +87,13 @@ class TripParser
                 delay: $departureDelay ?? $arrivalDelay,
                 arrivalDelay: $arrivalDelay,
                 departureDelay: $departureDelay,
-                reported: ($rawStop?->dProgType ?? null) === 'REPORTED'
+                reported: ($rawStop?->dProgType ?? null) === 'REPORTED',
+                border: $rawStop?->border ?? null,
+                remarks: $remarks
             );
         }
 
-        $remarks = [];
-        foreach ($rawJourney->msgL ?? [] as $message) {
-            if (!isset($message->remX)) {
-                continue;
-            }
-            $rawMessage = $rawCommon->remL[$message->remX];
-
-            $remarks[] = new Remark(
-                type: $rawMessage?->type ?? null,
-                code: $rawMessage?->code ?? null,
-                prio: $rawMessage?->prio ?? null,
-                message: $rawMessage?->txtN ?? null,
-            );
-        }
+        $remarks = $this->parseRemarks($rawJourney->msgL ?? [], $rawCommon->remL ?? []);
 
         $admin = null;
         if (isset($rawLine?->prodCtx?->admin) && $rawLine?->prodCtx?->admin) {
@@ -125,5 +120,29 @@ class TripParser
             stopovers: $stopovers,
             remarks: $remarks,
         );
+    }
+
+    /**
+     * @param array $msgL
+     * @param array $remL
+     * @return array
+     */
+    public function parseRemarks(array $msgL, array $remL): array
+    {
+        $remarks = [];
+        foreach ($msgL ?? [] as $message) {
+            if (!isset($message->remX)) {
+                continue;
+            }
+            $rawMessage = $remL[$message->remX];
+
+            $remarks[] = new Remark(
+                type: $rawMessage?->type ?? null,
+                code: $rawMessage?->code ?? null,
+                prio: $rawMessage?->prio ?? null,
+                message: $rawMessage?->txtN ?? null,
+            );
+        }
+        return $remarks;
     }
 }

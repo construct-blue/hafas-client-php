@@ -6,6 +6,7 @@ namespace HafasClientTest\Response;
 
 use HafasClient\Parser\TripParser;
 use HafasClient\Profile\Config;
+use HafasClient\Request\JourneyMatchRequest;
 use HafasClient\Response\JourneyMatchResponse;
 use PHPUnit\Framework\TestCase;
 
@@ -17,7 +18,7 @@ class JourneyMatchResponseTest extends TestCase
             file_get_contents(__DIR__ . '/../raw-responses/JourneyMatch.json')
         );
         $response = new JourneyMatchResponse(new TripParser(Config::fromFile(__DIR__ . '/../config/config.json')));
-        $journeys = $response->parse($rawResponse);
+        $journeys = $response->parse($rawResponse, new JourneyMatchRequest('', false));
         self::assertCount(62, $journeys);
         self::assertEquals('1|332602|0|80|3042023', $journeys[0]->id);
         self::assertEquals('Chur', $journeys[0]->stopovers[0]->stop->name);
@@ -30,7 +31,7 @@ class JourneyMatchResponseTest extends TestCase
         self::assertEquals('2023-01-08T15:06:00+01:00', $journeys[5]->stopovers[0]->departure->format(DATE_ATOM));
         self::assertEquals('2023-01-08T21:54:00+01:00', $journeys[5]->stopovers[1]->arrival->format(DATE_ATOM));
         self::assertEquals('Hamburg-Altona', $journeys[5]->stopovers[1]->stop->name);
-        self::assertEquals('85____', $journeys[5]->line->admin);
+        self::assertEquals('85', $journeys[5]->line->admin);
         self::assertEquals('DB Fernverkehr AG', $journeys[5]->line->operator->name);
     }
 }
