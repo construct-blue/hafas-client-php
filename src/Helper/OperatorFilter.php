@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace HafasClient\Helper;
 
+use HafasClient\Profile\Config;
+
 class OperatorFilter
 {
     private array $filter;
@@ -15,12 +17,21 @@ class OperatorFilter
     }
 
 
-    public function filter(): array
+    public function filter(Config $config): array
     {
+        $operators = $config->getOperators();
+
+        $filter = [];
+        foreach ($operators as $operator) {
+            if (in_array($operator->id, $this->filter)) {
+                $filter[] = $operator->name;
+            }
+        }
+
         return [
             'type' => 'OP',
             'mode' => 'INC',
-            'value' => implode(',', $this->filter)
+            'value' => implode(',', $filter)
         ];
     }
 }

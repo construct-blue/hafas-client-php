@@ -28,6 +28,6 @@ class ConfigTest extends TestCase
         self::assertEquals(true, $products[0]->default);
         $operators = $config->getOperators();
         self::assertCount(3, $operators);
-        self::assertEquals('db-fern', $operators[0]->id);
+        self::assertEquals('dbfern', $operators[0]->id);
     }
 }

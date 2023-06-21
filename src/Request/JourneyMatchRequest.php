@@ -8,9 +8,9 @@ use DateTime;
 use HafasClient\Helper\OperatorFilter;
 use HafasClient\Helper\ProductFilter;
 use HafasClient\Helper\Time;
-use JsonSerializable;
+use HafasClient\Profile\Config;
 
-class JourneyMatchRequest implements JsonSerializable
+class JourneyMatchRequest
 {
     private string $query;
     private DateTime $fromWhen;
@@ -111,7 +111,7 @@ class JourneyMatchRequest implements JsonSerializable
         return $this;
     }
 
-    public function jsonSerialize(): array
+    public function toArray(Config $config): array
     {
         $data = [
             'cfg' => [
@@ -127,7 +127,7 @@ class JourneyMatchRequest implements JsonSerializable
         ];
 
         if (isset($this->operatorFilter)) {
-            $data['req']['jnyFltrL'][] = $this->operatorFilter->filter();
+            $data['req']['jnyFltrL'][] = $this->operatorFilter->filter($config);
         }
 
         if (isset($this->fromWhen)) {

@@ -8,7 +8,7 @@
   "defaultTZOffset": 120,
   "operators": [
     {
-      "id": "db-fern",
+      "id": "dbfern",
       "name": "DB Fernverkehr AG"
     },
     {
