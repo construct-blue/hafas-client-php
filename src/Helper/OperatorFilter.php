@@ -35,7 +35,7 @@ class OperatorFilter
 
         $filter = [];
         foreach ($operators as $operator) {
-            if (in_array($operator->id, $this->filter)) {
+            if (!isset($operator->admin) && in_array($operator->id, $this->filter)) {
                 $filter[] = $operator->name;
             }
         }
