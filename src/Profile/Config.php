@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace HafasClient\Profile;
 
+use stdClass;
+
 class Config
 {
     private string $userAgent;
@@ -14,27 +16,31 @@ class Config
     private bool $addChecksum;
     private int $defaultTZOffset;
 
+    /** @var Product[] */
     private array $products;
 
 
     /**
+     * @param string $userAgent
      * @param string $endpoint
      * @param string|null $salt
      * @param string $defaultLanguage
      * @param bool $addMicMac
      * @param bool $addChecksum
      * @param int $defaultTZOffset
+     * @param Product[] $products
      */
     public function __construct(
-        string $userAgent,
-        string $endpoint,
+        string  $userAgent,
+        string  $endpoint,
         ?string $salt,
-        string $defaultLanguage,
-        bool $addMicMac,
-        bool $addChecksum,
-        int $defaultTZOffset,
-        array $products
-    ) {
+        string  $defaultLanguage,
+        bool    $addMicMac,
+        bool    $addChecksum,
+        int     $defaultTZOffset,
+        array   $products
+    )
+    {
         $this->userAgent = $userAgent;
         $this->endpoint = $endpoint;
         $this->salt = $salt;
@@ -49,14 +55,22 @@ class Config
     {
         $data = json_decode(file_get_contents($filename));
         return new Config(
-            userAgent: $data->userAgent,
+            userAgent: $data->userAgent ?? 'hafas-php-client',
             endpoint: $data->endpoint,
-            salt: $data->salt,
-            defaultLanguage: $data->defaultLanguage,
-            addMicMac: $data->addMicMac,
-            addChecksum: $data->addChecksum,
-            defaultTZOffset: $data->defaultTZOffset,
-            products: $data->products ?? []
+            salt: (string)$data->salt ?? '',
+            defaultLanguage: (string)$data->defaultLanguage ?? 'en',
+            addMicMac: (bool)$data->addMicMac ?? false,
+            addChecksum: (bool)$data->addChecksum ?? false,
+            defaultTZOffset: (int)$data->defaultTZOffset ?? 0,
+            products: array_map(
+                fn(stdClass $product) => new Product(
+                    (string)$product->id ?? '',
+                    array_map('intval', $product->bitmasks),
+                    (string)$product->name ?? '',
+                    (string)$product->short ?? '',
+                    (bool)$product->default
+                ),
+                $data->products ?? [])
         );
     }
 
@@ -117,7 +131,7 @@ class Config
     }
 
     /**
-     * @return array
+     * @return Product[]
      */
     public function getProducts(): array
     {

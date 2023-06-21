@@ -3,6 +3,7 @@
 namespace HafasClient\Models;
 
 use Carbon\Carbon;
+use DateTime;
 
 /**
  * @package HafasClient\Models
@@ -13,7 +14,7 @@ class Trip implements \JsonSerializable
 
     public string $id;
     public ?string $direction;
-    public ?Carbon $date;
+    public ?DateTime $date;
     public ?Line $line;
     /** @var Stopover[]|null */
     public ?array $stopovers;
@@ -23,7 +24,7 @@ class Trip implements \JsonSerializable
     public function __construct(
         string $id,
         string $direction = null,
-        Carbon $date = null,
+        DateTime $date = null,
         Line $line = null,
         array $stopovers = null,
         array $remarks = null

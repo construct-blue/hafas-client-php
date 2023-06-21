@@ -2,7 +2,7 @@
 
 namespace HafasClient\Models;
 
-use Carbon\Carbon;
+use DateTime;
 
 /**
  * @package HafasClient\Models
@@ -13,11 +13,11 @@ class Stopover implements \JsonSerializable
 
     public Stop $stop;
     public ?int $index;
-    public ?Carbon $plannedArrival;
-    public ?Carbon $arrival;
+    public ?DateTime $plannedArrival;
+    public ?DateTime $arrival;
     public ?string $arrivalPlatform;
-    public ?Carbon $plannedDeparture;
-    public ?Carbon $departure;
+    public ?DateTime $plannedDeparture;
+    public ?DateTime $departure;
     public ?string $departurePlatform;
     public ?bool $isCancelled;
     public ?int $delay;
@@ -31,11 +31,11 @@ class Stopover implements \JsonSerializable
     public function __construct(
         Stop $stop,
         int $index = null,
-        Carbon $plannedArrival = null,
-        Carbon $arrival = null,
+        DateTime $plannedArrival = null,
+        DateTime $arrival = null,
         string $arrivalPlatform = null,
-        Carbon $plannedDeparture = null,
-        Carbon $departure = null,
+        DateTime $plannedDeparture = null,
+        DateTime $departure = null,
         string $departurePlatform = null,
         bool $isCancelled = null,
         int $delay = null,
