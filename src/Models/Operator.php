@@ -2,23 +2,18 @@
 
 namespace HafasClient\Models;
 
+use JsonSerializable;
+
 /**
  * @package HafasClient\Models
- * @todo    make readonly
  */
-class Operator implements \JsonSerializable
+readonly class Operator implements JsonSerializable
 {
-
-    public ?string $id;
-    public ?string $name;
-
-    public function __construct(string $id = null, string $name = null)
+    public function __construct(public ?string $id = null, public ?string $name = null)
     {
-        $this->id = $id;
-        $this->name = $name;
     }
 
-    public function jsonSerialize(): mixed
+    public function jsonSerialize(): array
     {
         return [
             'type' => 'operator',

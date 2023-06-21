@@ -2,28 +2,19 @@
 
 namespace HafasClient\Models;
 
+use JsonSerializable;
+
 /**
  * @package HafasClient\Models
- * @todo    make readonly
  */
-class Remark implements \JsonSerializable
+readonly class Remark implements JsonSerializable
 {
-
-    public ?string $type;
-    public ?string $code;
-    public ?int $prio;
-    public ?string $message;
-
     public function __construct(
-        string $type = null,
-        string $code = null,
-        int $prio = null,
-        string $message = null
+        public ?string $type = null,
+        public ?string $code = null,
+        public ?int $prio = null,
+        public ?string $message = null
     ) {
-        $this->type = $type;
-        $this->code = $code;
-        $this->prio = $prio;
-        $this->message = $message;
     }
 
     public function jsonSerialize(): array

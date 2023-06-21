@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace HafasClient\Parser;
 
 use HafasClient\Helper\Time;
+use HafasClient\Models\Product;
 use HafasClient\Models\Trip;
 use HafasClient\Models\Line;
 use HafasClient\Models\Location;
@@ -23,6 +24,10 @@ class TripParser
 
     public function parse(stdClass $rawCommon, stdClass $rawJourney): Trip
     {
+        $remarksParser = new RemarksParser();
+        $productParser = new ProductParser($this->config);
+        $operatorParser = new OperatorParser($this->config);
+
         $defaultTZOffset = $this->config->getDefaultTZOffset();
         $rawLine = $rawCommon->prodL[$rawJourney->prodX];
         $rawLineOperator = $rawCommon->opL[$rawLine->oprX ?? 0] ?? null;
@@ -64,7 +69,7 @@ class TripParser
             $arrivalPlatform = $rawStop?->aPlatfR ?? $rawStop?->aPltfR?->txt ?? $arrivalPlatformPlanned;
             $departurePlatformPlanned = $rawStop?->dPlatfS ?? $rawStop?->dPltfS?->txt ?? null;
             $departurePlatform = $rawStop?->dPlatfR ?? $rawStop?->dPltfR?->txt ?? $departurePlatformPlanned;
-            $remarks = $this->parseRemarks($rawStop->msgL ?? [], $rawCommon->remL ?? []);
+            $remarks = $remarksParser->parse($rawStop->msgL ?? [], $rawCommon->remL ?? []);
 
             $stopovers[] = new Stopover(
                 stop: new Stop(
@@ -93,12 +98,14 @@ class TripParser
             );
         }
 
-        $remarks = $this->parseRemarks($rawJourney->msgL ?? [], $rawCommon->remL ?? []);
+        $remarks = $remarksParser->parse($rawJourney->msgL ?? [], $rawCommon->remL ?? []);
 
         $admin = null;
         if (isset($rawLine?->prodCtx?->admin) && $rawLine?->prodCtx?->admin) {
             $admin = trim((string)$rawLine?->prodCtx?->admin, '_');
         }
+
+        $product = $productParser->parse((int)$rawLine->cls ?? 0)[0] ?? null;
 
         return new Trip(
             id: $rawJourney?->jid ?? '',
@@ -109,40 +116,13 @@ class TripParser
                 name: $rawLine?->name ?? null,
                 category: $rawLine?->prodCtx?->catOut ?? null,
                 number: $rawLine?->number ?? null,
-                mode: '',//TODO map to products $rawLine?->cls is bitmask of product
-                product: '',//TODO
-                operator: new Operator(
-                    id: $rawLineOperator?->name ?? null, //TODO: where from?
-                    name: $rawLineOperator?->name ?? null
-                ),
+                mode: $product?->mode,
+                product: $product,
+                operator: $operatorParser->parse($rawLineOperator),
                 admin: $admin,
             ),
             stopovers: $stopovers,
             remarks: $remarks,
         );
-    }
-
-    /**
-     * @param array $msgL
-     * @param array $remL
-     * @return array
-     */
-    public function parseRemarks(array $msgL, array $remL): array
-    {
-        $remarks = [];
-        foreach ($msgL ?? [] as $message) {
-            if (!isset($message->remX)) {
-                continue;
-            }
-            $rawMessage = $remL[$message->remX];
-
-            $remarks[] = new Remark(
-                type: $rawMessage?->type ?? null,
-                code: $rawMessage?->code ?? null,
-                prio: $rawMessage?->prio ?? null,
-                message: $rawMessage?->txtN ?? null,
-            );
-        }
-        return $remarks;
     }
 }

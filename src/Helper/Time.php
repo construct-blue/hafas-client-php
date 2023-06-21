@@ -9,7 +9,7 @@ use DateTime;
 abstract class Time
 {
 
-    public static function parseDatetime(string $rawDate, string $rawTime, float $tzOffset): DateTime
+    public static function parseDatetime(string $rawDate, string $rawTime, float $tzOffset): Carbon
     {
         $year = substr($rawDate, 0, 4);
         $month = substr($rawDate, 4, 2);

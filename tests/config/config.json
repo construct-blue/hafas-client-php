@@ -6,6 +6,20 @@
   "addMicMac": false,
   "addChecksum": true,
   "defaultTZOffset": 120,
+  "operators": [
+    {
+      "id": "db-fern",
+      "name": "DB Fernverkehr AG"
+    },
+    {
+      "id": "oebb",
+      "name": "Österreichische Bundesbahnen"
+    },
+    {
+      "id": "cd",
+      "name": "Ceske Drahy"
+    }
+  ],
   "products": [
     {
       "id": "nationalExpress",

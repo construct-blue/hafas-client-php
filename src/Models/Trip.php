@@ -2,39 +2,31 @@
 
 namespace HafasClient\Models;
 
-use Carbon\Carbon;
 use DateTime;
+use JsonSerializable;
 
 /**
  * @package HafasClient\Models
- * @todo    make readonly
  */
-class Trip implements \JsonSerializable
+readonly class Trip implements JsonSerializable
 {
-
-    public string $id;
-    public ?string $direction;
-    public ?DateTime $date;
-    public ?Line $line;
-    /** @var Stopover[]|null */
-    public ?array $stopovers;
-    /** @var Remark[]|null  */
-    public ?array $remarks;
-
+    /**
+     * @param string $id
+     * @param string|null $direction
+     * @param DateTime|null $date
+     * @param Line|null $line
+     * @param Stopover[] $stopovers
+     * @param Remark[] $remarks
+     */
     public function __construct(
-        string $id,
-        string $direction = null,
-        DateTime $date = null,
-        Line $line = null,
-        array $stopovers = null,
-        array $remarks = null
-    ) {
-        $this->id = $id;
-        $this->direction = $direction;
-        $this->date = $date;
-        $this->line = $line;
-        $this->stopovers = $stopovers;
-        $this->remarks = $remarks;
+        public string    $id,
+        public ?string   $direction = null,
+        public ?DateTime $date = null,
+        public ?Line     $line = null,
+        public array     $stopovers = [],
+        public array     $remarks = []
+    )
+    {
     }
 
     public function jsonSerialize(): array

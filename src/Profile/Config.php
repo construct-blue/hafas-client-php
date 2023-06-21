@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace HafasClient\Profile;
 
+use HafasClient\Models\Operator;
+use HafasClient\Models\Product;
 use stdClass;
 
 class Config
@@ -19,6 +21,9 @@ class Config
     /** @var Product[] */
     private array $products;
 
+    /** @var Operator[] */
+    private array $operators;
+
 
     /**
      * @param string $userAgent
@@ -29,6 +34,7 @@ class Config
      * @param bool $addChecksum
      * @param int $defaultTZOffset
      * @param Product[] $products
+     * @param Operator[] $operators
      */
     public function __construct(
         string  $userAgent,
@@ -38,7 +44,8 @@ class Config
         bool    $addMicMac,
         bool    $addChecksum,
         int     $defaultTZOffset,
-        array   $products
+        array   $products,
+        array   $operators
     )
     {
         $this->userAgent = $userAgent;
@@ -49,28 +56,37 @@ class Config
         $this->addChecksum = $addChecksum;
         $this->defaultTZOffset = $defaultTZOffset;
         $this->products = $products;
+        $this->operators = $operators;
     }
 
     public static function fromFile(string $filename): Config
     {
-        $data = json_decode(file_get_contents($filename));
+        $config = json_decode(file_get_contents($filename));
         return new Config(
-            userAgent: $data->userAgent ?? 'hafas-php-client',
-            endpoint: $data->endpoint,
-            salt: (string)$data->salt ?? '',
-            defaultLanguage: (string)$data->defaultLanguage ?? 'en',
-            addMicMac: (bool)$data->addMicMac ?? false,
-            addChecksum: (bool)$data->addChecksum ?? false,
-            defaultTZOffset: (int)$data->defaultTZOffset ?? 0,
+            userAgent: $config->userAgent ?? 'hafas-php-client',
+            endpoint: $config->endpoint,
+            salt: (string)$config->salt ?? '',
+            defaultLanguage: (string)$config->defaultLanguage ?? 'en',
+            addMicMac: (bool)$config->addMicMac ?? false,
+            addChecksum: (bool)$config->addChecksum ?? false,
+            defaultTZOffset: (int)$config->defaultTZOffset ?? 0,
             products: array_map(
                 fn(stdClass $product) => new Product(
-                    (string)$product->id ?? '',
-                    array_map('intval', $product->bitmasks),
-                    (string)$product->name ?? '',
-                    (string)$product->short ?? '',
-                    (bool)$product->default
+                    id: (string)$product->id ?? '',
+                    mode: (string)$product->mode ?? '',
+                    bitmasks: array_map('intval', $product->bitmasks),
+                    name: (string)$product->name ?? '',
+                    short: (string)$product->short ?? '',
+                    default: (bool)$product->default
                 ),
-                $data->products ?? [])
+                $config->products ?? []),
+            operators: array_map(
+                fn(stdClass $operator) => new Operator(
+                    (string)$operator->id,
+                    (string)$operator->name
+                ),
+                $config->operators ?? []
+            )
         );
     }
 
@@ -136,5 +152,13 @@ class Config
     public function getProducts(): array
     {
         return $this->products;
+    }
+
+    /**
+     * @return Operator[]
+     */
+    public function getOperators(): array
+    {
+        return $this->operators;
     }
 }

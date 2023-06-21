@@ -3,63 +3,48 @@
 namespace HafasClient\Models;
 
 use DateTime;
+use JsonSerializable;
 
 /**
  * @package HafasClient\Models
- * @todo    make readonly
  */
-class Stopover implements \JsonSerializable
+readonly class Stopover implements JsonSerializable
 {
-
-    public Stop $stop;
-    public ?int $index;
-    public ?DateTime $plannedArrival;
-    public ?DateTime $arrival;
-    public ?string $arrivalPlatform;
-    public ?DateTime $plannedDeparture;
-    public ?DateTime $departure;
-    public ?string $departurePlatform;
-    public ?bool $isCancelled;
-    public ?int $delay;
-    private ?int $arrivalDelay;
-    private ?int $departureDelay;
-    public ?bool $reported;
-    public ?bool $border;
-
-    public array $remarks;
-
+    /**
+     * @param Stop $stop
+     * @param int|null $index
+     * @param DateTime|null $plannedArrival
+     * @param DateTime|null $arrival
+     * @param string|null $arrivalPlatform
+     * @param DateTime|null $plannedDeparture
+     * @param DateTime|null $departure
+     * @param string|null $departurePlatform
+     * @param bool|null $isCancelled
+     * @param int|null $delay
+     * @param int|null $arrivalDelay
+     * @param int|null $departureDelay
+     * @param bool|null $reported
+     * @param bool|null $border
+     * @param Remark[] $remarks
+     */
     public function __construct(
-        Stop $stop,
-        int $index = null,
-        DateTime $plannedArrival = null,
-        DateTime $arrival = null,
-        string $arrivalPlatform = null,
-        DateTime $plannedDeparture = null,
-        DateTime $departure = null,
-        string $departurePlatform = null,
-        bool $isCancelled = null,
-        int $delay = null,
-        int $arrivalDelay = null,
-        int $departureDelay = null,
-        bool $reported = null,
-        bool $border = null,
-        array $remarks = []
-    ) {
-        $this->stop = $stop;
-        $this->index = $index;
-        $this->plannedArrival = $plannedArrival;
-        $this->arrival = $arrival;
-        $this->arrivalPlatform = $arrivalPlatform;
-        $this->plannedDeparture = $plannedDeparture;
-        $this->departure = $departure;
-        $this->departurePlatform = $departurePlatform;
-        $this->isCancelled = $isCancelled;
-        $this->delay = $delay;
-        $this->arrivalDelay = $arrivalDelay;
-        $this->departureDelay = $departureDelay;
-        $this->reported = $reported;
-        $this->border = $border;
-        $this->remarks = $remarks;
+        public Stop      $stop,
+        public ?int      $index = null,
+        public ?DateTime $plannedArrival = null,
+        public ?DateTime $arrival = null,
+        public ?string   $arrivalPlatform = null,
+        public ?DateTime $plannedDeparture = null,
+        public ?DateTime $departure = null,
+        public ?string   $departurePlatform = null,
+        public ?bool     $isCancelled = null,
+        public ?int      $delay = null,
+        public ?int      $arrivalDelay = null,
+        public ?int      $departureDelay = null,
+        public ?bool     $reported = null,
+        public ?bool     $border = null,
+        public array     $remarks = []
+    )
+    {
     }
 
     public function jsonSerialize(): array

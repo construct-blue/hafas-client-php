@@ -4,38 +4,22 @@ namespace HafasClient\Models;
 
 /**
  * @package HafasClient\Models
- * @todo    make readonly
  */
-class Line implements \JsonSerializable
+readonly class Line implements \JsonSerializable
 {
 
-    public string $id;
-    public ?string $name;
-    public ?string $category;
-    public ?string $number;
-    public ?string $mode;
-    public ?string $product;
-    public ?Operator $operator;
-    public ?string $admin;
-
     public function __construct(
-        string $id,
-        string $name = null,
-        string $category = null,
-        string $number = null,
-        string $mode = null,
-        string $product = null,
-        Operator $operator = null,
-        string $admin = null
-    ) {
-        $this->id = $id;
-        $this->name = $name;
-        $this->category = $category;
-        $this->number = $number;
-        $this->mode = $mode;
-        $this->product = $product;
-        $this->operator = $operator;
-        $this->admin = $admin;
+        public string    $id,
+        public ?string   $name = null,
+        public ?string   $category = null,
+        public ?string   $number = null,
+        public ?string   $mode = null,
+        public ?Product  $product = null,
+        public ?Operator $operator = null,
+        public ?string   $admin = null
+    )
+    {
+
     }
 
     public function jsonSerialize(): mixed
@@ -47,7 +31,7 @@ class Line implements \JsonSerializable
             'category' => $this->category,
             'number' => $this->number,
             'mode' => $this->mode,
-            'product' => $this->product,
+            'product' => $this->product ?? null,
             'operator' => $this->operator ?? null,
             'admin' => $this->admin ?? null,
         ];

@@ -21,10 +21,13 @@ class ConfigTest extends TestCase
         self::assertEquals(120, $config->getDefaultTZOffset());
         $products = $config->getProducts();
         self::assertCount(10, $products);
-        self::assertEquals('nationalExpress', $products[0]->getId());
-        self::assertEquals('InterCityExpress', $products[0]->getName());
-        self::assertEquals([1], $products[0]->getBitmasks());
-        self::assertEquals('ICE', $products[0]->getShort());
-        self::assertEquals(true, $products[0]->isDefault());
+        self::assertEquals('nationalExpress', $products[0]->id);
+        self::assertEquals('InterCityExpress', $products[0]->name);
+        self::assertEquals([1], $products[0]->bitmasks);
+        self::assertEquals('ICE', $products[0]->short);
+        self::assertEquals(true, $products[0]->default);
+        $operators = $config->getOperators();
+        self::assertCount(3, $operators);
+        self::assertEquals('db-fern', $operators[0]->id);
     }
 }
