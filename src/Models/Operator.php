@@ -9,7 +9,11 @@ use JsonSerializable;
  */
 readonly class Operator implements JsonSerializable
 {
-    public function __construct(public ?string $id = null, public ?string $name = null)
+    public function __construct(
+        public ?string $id = null,
+        public ?string $name = null,
+        public ?string $admin = null
+    )
     {
     }
 
@@ -19,6 +23,7 @@ readonly class Operator implements JsonSerializable
             'type' => 'operator',
             'id' => $this->id,
             'name' => $this->name,
+            'admin' => $this->admin
         ];
     }
 

@@ -83,7 +83,8 @@ class Config
             operators: array_map(
                 fn(stdClass $operator) => new Operator(
                     (string)$operator->id,
-                    (string)$operator->name
+                    (string)$operator->name,
+                    isset($operator->admin) ? (string)$operator->admin : null
                 ),
                 $config->operators ?? []
             )

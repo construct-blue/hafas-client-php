@@ -8,6 +8,7 @@ use DateTime;
 use HafasClient\Helper\OperatorFilter;
 use HafasClient\Helper\ProductFilter;
 use HafasClient\Helper\Time;
+use HafasClient\Models\Trip;
 use HafasClient\Profile\Config;
 
 class JourneyMatchRequest
@@ -94,14 +95,6 @@ class JourneyMatchRequest
     }
 
     /**
-     * @return string|null
-     */
-    public function getAdmin(): ?string
-    {
-        return $this->admin;
-    }
-
-    /**
      * @param string|null $admin
      * @return JourneyMatchRequest
      */
@@ -109,6 +102,39 @@ class JourneyMatchRequest
     {
         $this->admin = $admin;
         return $this;
+    }
+
+    private function getAdmins(Config $config): array
+    {
+        if (isset($this->operatorFilter)) {
+            $result = $this->operatorFilter->admins($config);
+        } else {
+            $result = [];
+
+        }
+        if (isset($this->admin)) {
+            $result[] = $this->admin;
+        }
+
+        return $result;
+    }
+
+
+    /**
+     * @param Trip[] $trips
+     * @return Trip[]
+     */
+    public function filter(Config $config, array $trips): array
+    {
+        $admins = $this->getAdmins($config);
+        if ($admins !== []) {
+            foreach ($trips as $i => $trip) {
+                if (!in_array($trip->line->admin, $admins)) {
+                    unset($trips[$i]);
+                }
+            }
+        }
+        return $trips;
     }
 
     public function toArray(Config $config): array

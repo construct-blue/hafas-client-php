@@ -18,7 +18,7 @@ class JourneyMatchResponseTest extends TestCase
             file_get_contents(__DIR__ . '/../raw-responses/JourneyMatch.json')
         );
         $response = new JourneyMatchResponse(new TripParser(Config::fromFile(__DIR__ . '/../config/config.json')));
-        $journeys = $response->parse($rawResponse, new JourneyMatchRequest('', false));
+        $journeys = $response->parse($rawResponse);
         self::assertCount(62, $journeys);
         self::assertEquals('1|332602|0|80|3042023', $journeys[0]->id);
         self::assertEquals('Chur', $journeys[0]->stopovers[0]->stop->name);

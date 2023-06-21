@@ -230,10 +230,11 @@ class Hafas
      */
     public function tripsByName(JourneyMatchRequest $request): array
     {
-        return (new JourneyMatchResponse(new TripParser($this->config)))->parse(
-            $this->request->request($this->config, $request->toArray($this->config)),
-            $request
+        $trips = (new JourneyMatchResponse(new TripParser($this->config)))->parse(
+            $this->request->request($this->config, $request->toArray($this->config))
         );
+
+        return $request->filter($this->config, $trips);
     }
 
     public function trip(string $id): Trip

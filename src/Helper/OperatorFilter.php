@@ -16,6 +16,18 @@ class OperatorFilter
         $this->filter = $operator;
     }
 
+    public function admins(Config $config): array
+    {
+        $operators = $config->getOperators();
+
+        $admins = [];
+        foreach ($operators as $operator) {
+            if (isset($operator->admin) && in_array($operator->id, $this->filter)) {
+                $admins[] = $operator->admin;
+            }
+        }
+        return $admins;
+    }
 
     public function filter(Config $config): array
     {

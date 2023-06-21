@@ -13,35 +13,43 @@
     },
     {
       "id": "dbfern",
-      "name": "DB Fernverkehr AG"
+      "name": "DB Fernverkehr AG",
+      "admin": "80"
     },
     {
       "id": "oebb",
-      "name": "Österreichische Bundesbahnen"
+      "name": "Österreichische Bundesbahnen",
+      "admin": "81"
     },
     {
       "id": "cd",
-      "name": "Ceske Drahy"
+      "name": "Ceske Drahy",
+      "admin": "54"
     },
     {
       "id": "sbb",
-      "name": "SBB"
+      "name": "SBB",
+      "admin": "85"
     },
     {
       "id": "cfr",
-      "name": "Rumänische Eisenbahnen Caile Ferate Romane"
+      "name": "Rumänische Eisenbahnen Caile Ferate Romane",
+      "admin": "53"
     },
     {
       "id": "ns",
-      "name": "Nederlandse Spoorwegen"
+      "name": "Nederlandse Spoorwegen",
+      "admin": "84"
     },
     {
       "id": "trenit",
-      "name": "Trenitalia"
+      "name": "Trenitalia",
+      "admin": "83"
     },
     {
       "id": "mav",
-      "name": "MAV"
+      "name": "MAV",
+      "admin": "55"
     }
   ],
   "products": [

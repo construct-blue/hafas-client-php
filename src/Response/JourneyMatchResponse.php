@@ -19,7 +19,7 @@ class JourneyMatchResponse
      * @return Trip[]
      * @throws InvalidHafasResponse
      */
-    public function parse(stdClass $rawResponse, JourneyMatchRequest $request): array
+    public function parse(stdClass $rawResponse): array
     {
         if (!isset($rawResponse->svcResL[0]->res->jnyL)) {
             throw new InvalidHafasResponse();
@@ -29,11 +29,7 @@ class JourneyMatchResponse
 
         $journeys = [];
         foreach ($rawResponse->svcResL[0]->res->jnyL as $rawJourney) {
-            $trip = $this->parser->parse($rawCommon, $rawJourney);
-            if ($request->getAdmin() && $trip->line->admin !== $request->getAdmin()) {
-                continue;
-            }
-            $journeys[] = $trip;
+            $journeys[] = $this->parser->parse($rawCommon, $rawJourney);
         }
         return $journeys;
     }
