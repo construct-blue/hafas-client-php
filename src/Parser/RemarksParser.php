@@ -17,7 +17,7 @@ class RemarksParser
     public function parse(array $msgL, array $remL): array
     {
         $remarks = [];
-        foreach ($msgL ?? [] as $message) {
+        foreach ($msgL as $message) {
             if (!isset($message->remX)) {
                 continue;
             }

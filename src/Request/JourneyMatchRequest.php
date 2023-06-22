@@ -134,7 +134,7 @@ class JourneyMatchRequest
                 }
             }
         }
-        return $trips;
+        return array_values($trips);
     }
 
     public function toArray(Config $config): array
